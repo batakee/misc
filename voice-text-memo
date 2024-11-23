@@ -33,26 +33,18 @@
         }
         .button-container {
             display: flex;
-            flex-direction: column;
-            gap: 10px;
-            align-items: flex-end;
+            justify-content: flex-end;
+            margin-top: 20px;
+            padding-right: 16px;
         }
         button {
-            width: 80px;
-            height: 80px;
+            width: 240px;
+            height: 120px;
             border: none;
             border-radius: 8px;
             color: white;
-            font-size: 18px;
+            font-size: 20px;
             cursor: pointer;
-        }
-        #stopRecord {
-            background-color: #f44336;
-        }
-        #startRecord {
-            background-color: #2196F3;
-        }
-        #submitButton {
             background-color: #4CAF50;
         }
         .status {
@@ -66,6 +58,10 @@
             background-color: #ffebee;
             display: block;
         }
+        textarea:focus {
+            border-color: #4CAF50;
+            box-shadow: 0 0 5px rgba(74, 175, 80, 0.2);
+        }
     </style>
 </head>
 <body>
@@ -73,86 +69,21 @@
         <h1>音声メモ</h1>
         <form id="memoForm">
             <textarea id="memoText" name="memoText" placeholder="ここに音声が文字として表示されます"></textarea>
+            <div class="button-container">
+                <button type="submit" id="submitButton">送信</button>
+            </div>
         </form>
-        <div class="button-container">
-            <button type="button" id="stopRecord">停止</button>
-            <button type="button" id="startRecord">開始</button>
-            <button type="submit" form="memoForm" id="submitButton">送信</button>
-        </div>
         <div id="status" class="status"></div>
     </div>
 
     <script>
         let recognition;
-        const startRecordButton = document.getElementById('startRecord');
-        const stopRecordButton = document.getElementById('stopRecord');
         const memoText = document.getElementById('memoText');
         const status = document.getElementById('status');
         const form = document.getElementById('memoForm');
 
         // GASのデプロイURLを設定
         const GAS_URL = 'https://script.google.com/macros/s/AKfycbwAoJMgQLfZrqimW6LCXR2AznnaN8FqLGaFKA6xfTeDlJoOsnHpYxTM26MejB4L7HE-sA/exec';
-
-        // 音声認識の設定
-        if ('webkitSpeechRecognition' in window) {
-            recognition = new webkitSpeechRecognition();
-            recognition.continuous = true;
-            recognition.interimResults = true;
-            recognition.lang = 'ja-JP';
-
-            recognition.onresult = function(event) {
-                let finalTranscript = '';
-                let interimTranscript = '';
-
-                for (let i = event.resultIndex; i < event.results.length; i++) {
-                    const transcript = event.results[i][0].transcript;
-                    if (event.results[i].isFinal) {
-                        finalTranscript += transcript;
-                    } else {
-                        interimTranscript += transcript;
-                    }
-                }
-
-                memoText.value = finalTranscript || interimTranscript;
-            };
-
-            recognition.onerror = function(event) {
-                status.textContent = 'エラーが発生しました: ' + event.error;
-                status.style.display = 'block';
-            };
-
-            recognition.onend = function() {
-                status.textContent = '音声入力が終了しました';
-                status.classList.remove('recording');
-                startRecordButton.disabled = false;
-                stopRecordButton.disabled = true;
-            };
-        }
-
-        // 音声入力開始
-        startRecordButton.addEventListener('click', function() {
-            if (recognition) {
-                recognition.start();
-                status.textContent = '音声入力中...';
-                status.classList.add('recording');
-                startRecordButton.disabled = true;
-                stopRecordButton.disabled = false;
-            } else {
-                status.textContent = 'お使いのブラウザは音声入力に対応していません';
-                status.style.display = 'block';
-            }
-        });
-
-        // 音声入力停止
-        stopRecordButton.addEventListener('click', function() {
-            if (recognition) {
-                recognition.stop();
-                stopRecordButton.disabled = true;
-            }
-        });
-
-        // 初期状態で停止ボタンを無効化
-        stopRecordButton.disabled = true;
 
         // フォーム送信の処理
         form.addEventListener('submit', async function(e) {
@@ -186,6 +117,12 @@
             } catch (error) {
                 status.textContent = 'エラーが発生しました: ' + error.message;
             }
+        });
+
+        // テキストエリアをクリックしたときにネイティブの音声入力を起動
+        memoText.addEventListener('click', function() {
+            // モバイルデバイスのネイティブの音声入力キーボードを表示
+            this.focus();
         });
     </script>
 </body>
