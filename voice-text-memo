@@ -3,100 +3,81 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>音声メモアプリ</title>
+    <title>音声メモ</title>
     <style>
         body {
             font-family: 'Arial', sans-serif;
             margin: 0;
-            padding: 10px;
-            max-width: 100%;
-            box-sizing: border-box;
+            padding: 16px;
+            background-color: #f8f9fa;
         }
         .container {
-            display: grid;
-            grid-template-columns: 1fr 60px;
-            gap: 10px;
-            background-color: #f5f5f5;
-            padding: 10px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-        .main-content {
-            grid-column: 1;
-        }
-        .button-container {
-            grid-column: 2;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
+            max-width: 600px;
+            margin: 0 auto;
         }
         h1 {
-            font-size: 1.5rem;
-            margin: 0 0 10px 0;
+            font-size: 24px;
+            margin: 0 0 20px 0;
         }
         textarea {
             width: 100%;
-            height: 150px;
-            padding: 10px;
+            height: 200px;
+            padding: 12px;
             border: 1px solid #ddd;
-            border-radius: 4px;
-            resize: vertical;
+            border-radius: 8px;
+            resize: none;
+            margin-bottom: 20px;
+            font-size: 16px;
             box-sizing: border-box;
+            background-color: white;
+        }
+        .button-container {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            align-items: flex-end;
         }
         button {
-            width: 100%;
-            background-color: #4CAF50;
-            color: white;
-            padding: 15px 0;
+            width: 80px;
+            height: 80px;
             border: none;
-            border-radius: 4px;
+            border-radius: 8px;
+            color: white;
+            font-size: 18px;
             cursor: pointer;
-            font-size: 0.9rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            word-break: break-word;
-            text-align: center;
-            min-height: 50px;
-        }
-        button:hover {
-            background-color: #45a049;
         }
         #stopRecord {
             background-color: #f44336;
         }
-        #stopRecord:hover {
-            background-color: #da190b;
-        }
         #startRecord {
             background-color: #2196F3;
         }
-        #startRecord:hover {
-            background-color: #0b7dda;
+        #submitButton {
+            background-color: #4CAF50;
         }
         .status {
             margin-top: 10px;
             padding: 10px;
             border-radius: 4px;
-            grid-column: 1 / -1;
+            text-align: center;
+            display: none;
         }
         .recording {
             background-color: #ffebee;
+            display: block;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="main-content">
-            <h1>音声メモ</h1>
-            <form id="memoForm">
-                <textarea id="memoText" name="memoText" placeholder="ここに音声が文字として表示されます"></textarea>
-            </form>
-        </div>
+        <h1>音声メモ</h1>
+        <form id="memoForm">
+            <textarea id="memoText" name="memoText" placeholder="ここに音声が文字として表示されます"></textarea>
+        </form>
         <div class="button-container">
             <button type="button" id="stopRecord">停止</button>
             <button type="button" id="startRecord">開始</button>
-            <button type="submit" form="memoForm">送信</button>
+            <button type="submit" form="memoForm" id="submitButton">送信</button>
         </div>
         <div id="status" class="status"></div>
     </div>
@@ -110,7 +91,7 @@
         const form = document.getElementById('memoForm');
 
         // GASのデプロイURLを設定
-        const GAS_URL = '[GASのデプロイURL]';
+        const GAS_URL = 'https://script.google.com/macros/s/AKfycbwAoJMgQLfZrqimW6LCXR2AznnaN8FqLGaFKA6xfTeDlJoOsnHpYxTM26MejB4L7HE-sA/exec';
 
         // 音声認識の設定
         if ('webkitSpeechRecognition' in window) {
@@ -137,6 +118,7 @@
 
             recognition.onerror = function(event) {
                 status.textContent = 'エラーが発生しました: ' + event.error;
+                status.style.display = 'block';
             };
 
             recognition.onend = function() {
@@ -157,6 +139,7 @@
                 stopRecordButton.disabled = false;
             } else {
                 status.textContent = 'お使いのブラウザは音声入力に対応していません';
+                status.style.display = 'block';
             }
         });
 
@@ -185,6 +168,7 @@
                 formData.append('memoText', memoText.value);
 
                 status.textContent = '保存中...';
+                status.style.display = 'block';
                 
                 const response = await fetch(GAS_URL, {
                     method: 'POST',
