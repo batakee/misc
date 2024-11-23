@@ -38,8 +38,8 @@
             padding-right: 16px;
         }
         button {
-            width: 240px;
-            height: 120px;
+            width: 50%;
+            height: 100px;
             border: none;
             border-radius: 8px;
             color: white;
@@ -67,6 +67,7 @@
 <body>
     <div class="container">
         <h1>音声メモ</h1>
+        <p><a href="https://docs.google.com/spreadsheets/d/1rhqLBWz2mCYlZxF6PbOqrNkrDS79O3Bbrx8W2QSsoq0/edit?gid=0#gid=0">過去のメモ</a>
         <form id="memoForm">
             <textarea id="memoText" name="memoText" placeholder="ここに音声が文字として表示されます"></textarea>
             <div class="button-container">
